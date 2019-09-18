@@ -1,7 +1,6 @@
 package slog
 
 import (
-	"io"
 	"os"
 	"runtime"
 	"strings"
