@@ -1,6 +1,7 @@
 package slog
 
 import (
+	"io"
 	"os"
 	"runtime"
 	"strings"
@@ -93,8 +94,8 @@ func SetGlobalBuilder(b *LoggerBuilder) {
 
 }
 
-func SetGlobal(consoleLev lev, logPath string, fileLev lev) {
-	b := NewBuilder(consoleLev)
+func SetGlobal(consoleLev , logPath string, fileLev lev) {
+	b := NewBuilder(StringLev(consoleLev))
 	if logPath != "" {
 		fp, err := NewFilePrinter(FileConfig{Dir: logPath})
 		if err != nil {
@@ -105,10 +106,22 @@ func SetGlobal(consoleLev lev, logPath string, fileLev lev) {
 	global = b.Build()
 }
 
+func GlobalLogger()*Logger{
+	return global
+}
+
 type Logger struct {
 	rootLev lev
 	f       _DefaultFormater
 	lp      []levPrinter
+}
+
+func (l *Logger)Write(bs []byte)(int,error){
+	for _, n := range l.lp {
+		s:=string(bs)
+		n.p.Print(&s)
+	}
+	return len(bs),nil
 }
 
 func (l *Logger) Debug(args ...interface{}) {
